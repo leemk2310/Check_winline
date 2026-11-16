@@ -25,3 +25,4 @@ Repository chứa cấu hình Skill và kịch bản autotest kiểm tra Winline
 ├── .gitignore                 # Bỏ qua thư mục evidence
 └── README.md
 ```
+

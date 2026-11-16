@@ -118,18 +118,43 @@ Agent **tự động áp dụng toàn bộ quy chuẩn kiểm thử Winline** sa
 - **Tên QA:** Mặc định `MinhKhanh` (`X-Autotest-User: MinhKhanh`).
 - **Trello:** **KHÔNG tạo card trên Trello** (chỉ chạy và xuất bằng chứng video cục bộ).
 
-### 2. Quy tắc ma trận ĐƠN (Single-Winline Clean Matrix)
-- **YÊU CẦU BẮT BUỘC:** Khi chạy winline với 3 symbol (hoặc 5 symbol), **bắt buộc phải là WINLINE ĐƠN**, tuyệt đối KHÔNG để nhiều winline cùng xuất hiện một lúc.
+### 2. Quy tắc ma trận ĐƠN và Đa dạng hóa Symbol (Diverse Single-Winline Clean Matrix)
+- **YÊU CẦU BẮT BUỘC:** 
+  1. **WINLINE ĐƠN (Single-Winline):** Khi chạy winline với 3 symbol (hoặc 5 symbol), **bắt buộc phải là WINLINE ĐƠN**, tuyệt đối KHÔNG để nhiều winline cùng xuất hiện một lúc.
+  2. **ĐA DẠNG HÓA SYMBOL TỪNG LINE (Different Symbols per Winline):** **Mỗi Winline phải sử dụng một loại symbol khác nhau**, tuyệt đối KHÔNG dùng cố định 1 symbol cho tất cả các đường cược. Điều này giúp QA quan sát được chuyển động, animation và hiển thị đồ họa thực tế của các symbol khác nhau khi trúng winline.
 - **Lý do xảy ra lỗi trước đây:** Khi dùng `matrix: combo` tự sinh của autotest, runner điền ngẫu nhiên các ô filler bằng các symbol có thể trúng từ 1-2 ô (như xe đỏ, bình xăng, bugi) và không tính tới luật trả thưởng 2 chiều (Both-Ways LTR + RTL), khiến 1 cú spin trúng cùng lúc 6-7 lines (vd trúng Line 1, 3, 4, 5, 7, 8, 9).
-- **Quy tắc thiết kế ma trận 3 Symbol Đơn Chuẩn Xác 100%:**
-  1. **Symbol thắng (`winningSymbol`):** Chọn biểu tượng trả thưởng thông thường yêu cầu tối thiểu 3-of-a-kind (ví dụ: `sym8` - Vali), loại bỏ hoàn toàn Scatter, Bonus, Wild và các symbol trả thưởng từ 1-2 ô.
-  2. **3 ô trúng trên line mục tiêu:** Điền đúng `winningSymbol` vào 3 vị trí đầu tiên (Reels 1, 2, 3) của line.
+- **Quy tắc thiết kế ma trận Đơn & Đa dạng Symbol Chuẩn Xác 100%:**
+  1. **Bảng phân bổ Symbol khác nhau cho từng Winline:**
+     - Trích xuất danh sách các regular paying symbols an toàn của game từ paytable (loại bỏ Wild - sym1, Scatter/Bonus - sym12, và các symbol ăn 1-of-a-kind như xe đỏ - sym2).
+     - Gán mỗi line một symbol riêng biệt. Ví dụ chuẩn cho game 9 paylines (Highway King, Captain Treasure):
+       - **Line 1:** `Symbol 3` (Yellow Car / Tàu chiến)
+       - **Line 2:** `Symbol 8` (Luggage / Rương báu)
+       - **Line 3:** `Symbol 9` (Piston / Bánh lái)
+       - **Line 4:** `Symbol 4` (Green Car / La bàn)
+       - **Line 5:** `Symbol 5` (Jerry Can / Mỏ neo)
+       - **Line 6:** `Symbol 10` (Rims / Bản đồ)
+       - **Line 7:** `Symbol 11` (Sterling / Kiếm vàng)
+       - **Line 8:** `Symbol 6` (Petrol / Ống nhòm)
+       - **Line 9:** `Symbol 7` (Spark Plug / Móc sắt)
+     - **Bảng ma trận chuẩn 15 ô cho từng Line (Single-Winline & Đa dạng Symbol):**
+       | Winline | Symbol gán riêng | Ma trận 3 Symbol (`matrix: [...]`) | Ma trận 5 Symbol (`matrix: [...]`) |
+       | :---: | :---: | :--- | :--- |
+       | **Line 1** | `sym 3` | `[4, 5, 6, 7, 8, 3, 3, 3, 7, 8, 4, 5, 6, 7, 8]` | `[4, 5, 6, 7, 8, 3, 3, 3, 3, 3, 4, 5, 6, 7, 8]` |
+       | **Line 2** | `sym 8` | `[8, 8, 8, 6, 7, 3, 4, 5, 6, 7, 3, 4, 5, 6, 7]` | `[8, 8, 8, 8, 8, 3, 4, 5, 6, 7, 3, 4, 5, 6, 7]` |
+       | **Line 3** | `sym 9` | `[3, 4, 5, 6, 7, 3, 4, 5, 6, 7, 9, 9, 9, 6, 7]` | `[3, 4, 5, 6, 7, 3, 4, 5, 6, 7, 9, 9, 9, 9, 9]` |
+       | **Line 4** | `sym 4` | `[4, 5, 6, 7, 8, 3, 4, 6, 7, 8, 3, 5, 4, 7, 8]` | `[4, 5, 6, 7, 4, 3, 4, 6, 4, 8, 3, 5, 4, 7, 8]` |
+       | **Line 5** | `sym 5` | `[3, 4, 5, 7, 8, 3, 5, 6, 7, 8, 5, 4, 6, 7, 8]` | `[3, 4, 5, 7, 8, 3, 5, 6, 5, 8, 5, 4, 6, 7, 5]` |
+       | **Line 6** | `sym 10` | `[10, 10, 5, 6, 7, 3, 4, 10, 6, 7, 3, 4, 5, 6, 7]` | `[10, 10, 5, 10, 10, 3, 4, 10, 6, 7, 3, 4, 5, 6, 7]` |
+       | **Line 7** | `sym 11` | `[3, 4, 5, 6, 7, 3, 4, 11, 6, 7, 11, 11, 5, 6, 7]` | `[3, 4, 5, 6, 7, 3, 4, 11, 6, 7, 11, 11, 5, 11, 11]` |
+       | **Line 8** | `sym 6` | `[3, 6, 6, 7, 8, 6, 4, 5, 7, 8, 3, 4, 5, 7, 8]` | `[3, 6, 6, 6, 8, 6, 4, 5, 7, 6, 3, 4, 5, 7, 8]` |
+       | **Line 9** | `sym 7` | `[3, 4, 5, 6, 8, 7, 4, 5, 6, 8, 3, 7, 7, 6, 8]` | `[3, 4, 5, 6, 8, 7, 4, 5, 6, 7, 3, 7, 7, 7, 8]` |
+  2. **3 ô trúng trên line mục tiêu:** Điền đúng `winningSymbol` của line đó vào 3 vị trí đầu tiên (Reels 1, 2, 3) của line.
   3. **2 ô cuối trên line mục tiêu:** Điền symbol filler an toàn khác (Reels 4, 5) để ngắt chuỗi ở đúng 3 ô.
-  4. **Triệt tiêu các line phụ (Chống trúng 2 chiều Both-ways):** Các ô filler còn lại trên toàn bộ 15 ô phải được phân bổ theo 5 cột với 5 symbol hoàn toàn khác nhau (`Cột 0: f0, Cột 1: f1, Cột 2: f2, Cột 3: f3, Cột 4: f4`). Nhờ đó, không bao giờ có 2 ô liền kề giống nhau trên bất kỳ đường cược nào khác, triệt tiêu 100% khả năng trúng phụ từ cả 2 chiều.
+  4. **Triệt tiêu các line phụ (Chống trúng 2 chiều Both-ways):** Các ô filler còn lại trên toàn bộ 15 ô phải được phân bổ theo 5 cột với 5 symbol hoàn toàn khác nhau (`Cột 0: f0, Cột 1: f1, Cột 2: f2, Cột 3: f3, Cột 4: f4`), không trùng với `winningSymbol` và không chứa symbol ăn từ 1 ô. Nhờ đó, không bao giờ có 2 ô liền kề giống nhau trên bất kỳ đường cược nào khác, triệt tiêu 100% khả năng trúng phụ từ cả 2 chiều.
   5. **Nguồn ma trận chuẩn:**
-     - Game `sHighwayK`: Đọc từ [matrix_clean.json](file:///d:/Game_slot/evidence/HighwayKing/matrix_clean.json) hoặc `d:\antigravity-testing-kit-main\n59765\n59765.js`.
-     - Game `sGoldTour`: Đọc từ `d:\antigravity-testing-kit-main\GoldenTour\n57351.js`.
-     - Game mới: Chạy engine `Get_Winline` hoặc tính toán theo 5 cột filler khác nhau và validate cả 2 chiều trước khi inject vào test.
+     - Game `sHighwayK` & `sCaptainT`: Đọc từ [matrix_clean.json](file:///d:/Game_slot/evidence/CaptainTreasure/matrix_clean.json) (đã cấu hình 9 symbol riêng biệt cho 9 lines).
+     - Game `sGoldTour`: Đọc từ `d:\antigravity-testing-kit-main\GoldenTour\n57351.js` hoặc `winlines_no_freegame.json`.
+     - Game mới: Chạy engine tối ưu ma trận với `safeSymbols` (loại bỏ Wild, Scatter, 1-of-a-kind) và gán luân phiên từng symbol cho từng line.
   6. **Cách inject:** Truyền mảng 15 số nguyên `matrix: [id,...]` vào step `spin` thay vì dùng chuỗi `"combo"` ngẫu nhiên.
 
 ### 3. Kịch bản kiểm thử & Quy chuẩn Video Evidence (Từ lúc Spin đến hết Thời gian chờ)
